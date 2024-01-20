@@ -1,3 +1,4 @@
-bentoml
+bentoml==1.0.25
 transformers
 torch
+numba

@@ -1,9 +1,12 @@
 service: 'service:svc'
 include:
   - '*.py'
+  - 'patch.diff'
 python:
-  packages:
-    - torch
-    - transformers
+  lock_packages: false
+  requirements_txt: "./requirements.txt"
 models:
   - summarization:latest
+docker:
+  dockerfile_template: ./Dockerfile.template
+  base_image: "nvcr.io/nvidia/l4t-base:r32.7.1"

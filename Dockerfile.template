@@ -1,0 +1,48 @@
+{% extends bento_base_template %}
+{% block SETUP_BENTO_BASE_IMAGE %}
+{{ super() }}
+SHELL ["/bin/bash", "-c"]
+RUN apt update && apt install sudo nano ca-certificates -y && \
+    sudo sed -i 's/bionic/jammy/g' /etc/apt/sources.list && \
+    sudo apt update && \
+    sudo apt install libopenblas-base libopenmpi-dev libomp-dev --upgrade -y && \
+    sudo sed -i 's/jammy/bionic/g' /etc/apt/sources.list && \
+    sudo apt update && \
+    wget https://starship.rs/install.sh && \
+    sh install.sh -y  -B https://github.moeyy.xyz/https://github.com/starship/starship/releases && \
+    rm install.sh && apt clean && apt autoclean && rm  -rf /var/lib/apt/lists/*
+{% endblock %}
+
+{% block SETUP_BENTO_COMPONENTS %}
+RUN echo "bentoml  ALL=NOPASSWD: ALL">> /etc/sudoers && \
+    usermod -aG video bentoml
+
+USER bentoml
+ENV USER=bentoml
+ENV HOME=/home/$USER
+
+RUN wget  "https://github.moeyy.xyz/https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" && \
+    chmod +x Miniforge3-$(uname)-$(uname -m).sh && \
+    bash Miniforge3-$(uname)-$(uname -m).sh -b && \
+    $HOME/miniforge3/bin/conda init && \
+    rm Miniforge3*.sh && \
+    echo 'eval "$(starship init bash)"' >> $HOME/.bashrc && \
+    $HOME/miniforge3/bin/conda create -n py38 python=3.8 -y && \
+    echo 'conda activate py38' >> $HOME/.bashrc
+
+ENV PATH=$HOME/miniforge3/envs/py38/bin:$PATH
+
+ARG ALL_PROXY=192.168.0.188:8080
+ENV HF_ENDPOINT=https://hf-mirror.com
+
+RUN pip install gdown ipython && \
+    gdown --fuzzy "https://drive.google.com/file/d/1e9FDGt2zGS5C5Pms7wzHYRb0HuupngK1/view?usp=share_link" && \
+    gdown --fuzzy "https://drive.google.com/file/d/19UbYsKHhKnyeJ12VPUwcSvoxJaX7jQZ2/view?usp=share_link" && \
+    pip install torch-1.13.0a0+git7c98e70-cp38-cp38-linux_aarch64.whl && \
+    pip install torchvision-0.14.0a0+5ce4506-cp38-cp38-linux_aarch64.whl && \
+    pip install numpy --upgrade && rm torch*.whl
+{{ super() }}
+
+patch `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/resource.py patch.diff
+
+{% endblock %}
