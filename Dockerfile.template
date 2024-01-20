@@ -2,7 +2,7 @@
 {% block SETUP_BENTO_BASE_IMAGE %}
 {{ super() }}
 SHELL ["/bin/bash", "-c"]
-RUN apt update && apt install sudo nano ca-certificates patch -y && \
+RUN apt update && apt install sudo nano ca-certificates -y && \
     sudo sed -i 's/bionic/jammy/g' /etc/apt/sources.list && \
     sudo apt update && \
     sudo apt install libopenblas-base libopenmpi-dev libomp-dev --upgrade -y && \
@@ -43,6 +43,6 @@ RUN pip install gdown ipython && \
     pip install numpy --upgrade && rm torch*.whl
 {{ super() }}
 
-RUN patch `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/resource.py patch.diff
+RUN cp src/patch/resource.py `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/
 
 {% endblock %}

@@ -1,7 +1,7 @@
 service: 'service:svc'
 include:
   - '*.py'
-  - 'patch.diff'
+  - 'patch'
 python:
   lock_packages: false
   requirements_txt: "./requirements.txt"
