@@ -43,6 +43,6 @@ RUN pip install gdown ipython && \
     pip install numpy --upgrade && rm torch*.whl
 {{ super() }}
 
-patch `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/resource.py patch.diff
+RUN patch `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/resource.py patch.diff
 
 {% endblock %}
