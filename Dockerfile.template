@@ -2,7 +2,7 @@
 {% block SETUP_BENTO_BASE_IMAGE %}
 {{ super() }}
 SHELL ["/bin/bash", "-c"]
-RUN apt update && apt install sudo nano ca-certificates -y && \
+RUN apt update && apt install sudo nano ca-certificates patch -y && \
     sudo sed -i 's/bionic/jammy/g' /etc/apt/sources.list && \
     sudo apt update && \
     sudo apt install libopenblas-base libopenmpi-dev libomp-dev --upgrade -y && \
