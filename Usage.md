@@ -3,9 +3,7 @@
 ```
 pip install -r requirements.txt
 
-sudo apt update && sudo apt install patch -y
-
-patch `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/resource.py patch.diff
+cp src/patch/resource.py `pip show bentoml | grep Location | awk -F ': ' '{print $2}'`/bentoml/_internal/
 
 python download_model.py
 bentoml serve service:svc
